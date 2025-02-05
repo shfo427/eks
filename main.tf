@@ -9,13 +9,8 @@ module "eks" {
   
   # VPC #
   vpc_id           = var.vpc_id                     # 기존 VPC ID 를 참조
-  #vpc_id          = module.vpc.vpc_id              # 신규 VPC를 모듈로 정의한 경우            
-
-  subnet_ids       = var.private_subnet_ids         # 기존 private 서브넷을 참조 : 워커 노드(노드 그룹)를 보안상 Private Subnet에 배치
-  #subnets         = module.vpc.private_subnets     # 신규 Subnet을 모듈로 정의한 경우     
-
-  # enable_irsa = true                              # IAM OIDC 활성화 (eks모듈에서 자동 설정됨)
-  
+  subnet_ids       = var.private_subnet_ids         # 기존 private 서브넷을 참조 
+ 
   # EKS 관리에 필요한 IAM 역할 생성
   create_iam_role          = true
   iam_role_name            = "ServiceRole-${var.cluster_name}"      # 위 변수와 일반 문자열을 결합
@@ -32,33 +27,8 @@ module "eks" {
           }
         }
       ]
-    }
-    fp-LBcontroler = {
-      name = "fp-LBcontroler"
-      selectors = [
-        {
-          namespace = "kube-system"
-          labels = {
-            "app.kubernetes.io/name" = "aws-load-balancer-controller"
-          }
-        }
-      ]
-    }
+    } 
   }
-
-  # Worker 노드 그룹 
-  /* 
-  node_groups = {
-    eks_nodes = {
-      desired_capacity = 2
-      min_size         = 1
-      max_size         = 3
-
-      instance_type    = "m7a.large"        # Node spec을 2vCPU, 8GiB Memory로 통일
-      key_name         = var.ssh_key_name   # EC2 키 페어 이름 (SSH 접속용) : 생략 가능
-    }
-  }
-  */
 
   # 클러스터의 애드온 추가
   cluster_addons = {
